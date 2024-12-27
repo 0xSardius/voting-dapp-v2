@@ -4,6 +4,7 @@ import {Keypair, PublicKey} from '@solana/web3.js'
 import {Votingdappv2} from '../target/types/votingdappv2'
 import { BankrunProvider, startAnchor } from 'anchor-bankrun'
 import { VOTINGDAPPV2_PROGRAM_ID } from '@project/anchor'
+import { BN } from 'bn.js'
 
 const IDL = require('../target/idl/votingdappv2.json');
 
@@ -61,7 +62,15 @@ describe('Votingdappv2', () => {
     )
     const aoeIICandidate = await votingdappv2.account.candidate.fetch(aoeIIAddress);
     console.log(aoeIICandidate);
-    
+    expect(aoeIICandidate.candidateVotes).toEqual(new anchor.BN(0));
+
+    const [ogreBattle64Address] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Ogre Battle 64")],
+      votingAddress,
+    )
+    const ogreBattle64Candidate = await votingdappv2.account.candidate.fetch(ogreBattle64Address);
+    console.log(ogreBattle64Candidate);
+    expect(ogreBattle64Candidate.candidateVotes).toEqual(new anchor.BN(1));
 
   });
 
