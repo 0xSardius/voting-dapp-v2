@@ -33,11 +33,28 @@ export type Votingdappv2 = {
         },
         {
           "name": "poll",
+          "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "arg",
                 "path": "pollId"
+              }
+            ]
+          }
+        },
+        {
+          "name": "candidate",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "pollId"
+              },
+              {
+                "kind": "arg",
+                "path": "candidateName"
               }
             ]
           }
@@ -78,27 +95,12 @@ export type Votingdappv2 = {
         },
         {
           "name": "poll",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "arg",
-                "path": "pollId"
-              }
-            ]
-          }
-        },
-        {
-          "name": "candidate",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "arg",
                 "path": "pollId"
-              },
-              {
-                "kind": "arg",
-                "path": "candidateName"
               }
             ]
           }
@@ -123,6 +125,62 @@ export type Votingdappv2 = {
         },
         {
           "name": "pollEnd",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "vote",
+      "discriminator": [
+        227,
+        110,
+        155,
+        23,
+        136,
+        126,
+        172,
+        25
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "signer": true
+        },
+        {
+          "name": "poll",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "pollId"
+              }
+            ]
+          }
+        },
+        {
+          "name": "candidate",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "arg",
+                "path": "pollId"
+              },
+              {
+                "kind": "arg",
+                "path": "candidateName"
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "candidateName",
+          "type": "string"
+        },
+        {
+          "name": "pollId",
           "type": "u64"
         }
       ]
@@ -192,6 +250,10 @@ export type Votingdappv2 = {
           },
           {
             "name": "pollEnd",
+            "type": "u64"
+          },
+          {
+            "name": "candidateAmount",
             "type": "u64"
           }
         ]

@@ -51,10 +51,6 @@ describe('Votingdappv2', () => {
       "Age of Empires II",
       new anchor.BN(1),
     ).rpc();
-    await votingdappv2.methods.initializeCandidate(
-      "Ogre Battle 64",
-      new anchor.BN(1),
-    ).rpc();
 
     const [aoeIIAddress] = PublicKey.findProgramAddressSync(
       [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Age of Empires II")],
@@ -62,7 +58,12 @@ describe('Votingdappv2', () => {
     )
     const aoeIICandidate = await votingdappv2.account.candidate.fetch(aoeIIAddress);
     console.log(aoeIICandidate);
-    expect(aoeIICandidate.candidateVotes).toEqual(new anchor.BN(0));
+    expect(aoeIICandidate.candidateVotes.toNumber()).toEqual(0);
+
+    await votingdappv2.methods.initializeCandidate(
+      "Ogre Battle 64",
+      new anchor.BN(1),
+    ).rpc();
 
     const [ogreBattle64Address] = PublicKey.findProgramAddressSync(
       [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Ogre Battle 64")],
@@ -70,12 +71,22 @@ describe('Votingdappv2', () => {
     )
     const ogreBattle64Candidate = await votingdappv2.account.candidate.fetch(ogreBattle64Address);
     console.log(ogreBattle64Candidate);
-    expect(ogreBattle64Candidate.candidateVotes).toEqual(new anchor.BN(1));
-
+    expect(ogreBattle64Candidate.candidateVotes.toNumber()).toEqual(0);
   });
 
   it("vote", async() => {
+    await votingdappv2.methods.vote(
+      "Age of Empires II",
+      new anchor.BN(1)
+    ).rpc()
 
+    const [aoeIIAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Age of Empires II")],
+      votingAddress,
+    )
+    const aoeIICandidate = await votingdappv2.account.candidate.fetch(aoeIIAddress);
+    console.log(aoeIICandidate);
+    expect(aoeIICandidate.candidateVotes.toNumber()).toEqual(1);
   });
 
 
