@@ -17,14 +17,41 @@ pub mod votingdappv2 {
         Ok(())
     }
 
-    pub fn initialize_candidate(ctx: Context<InitializeCandidate>, _candidate_name: String, _poll_id: u64) -> Result<()> {
+    pub fn initialize_candidate(ctx: Context<InitializeCandidate>, candidate_name: String, _poll_id: u64) -> Result<()> {
         let candidate = &mut ctx.accounts.candidate;
+        let poll = &mut ctx.accounts.poll;
+        poll.candidate_amount += 1;
         candidate.candidate_name = candidate_name;
         candidate.candidate_votes = 0;
         Ok(())
     }
+
+    pub fn vote(ctx: Context<Vote>, _candidate_name: String, _poll_id: u64) -> Result<()> {
+        let candidate = &mut ctx.accounts.candidate;
+        candidate.candidate_votes += 1;
+        Ok(())
+    }
 }
 
+#[derive(Accounts)]
+#[instruction(candidate_name: String, poll_id: u64)]
+pub struct Vote<'info> {
+    #[account]
+    pub signer: Signer<'info>,
+    #[account(
+      
+      seeds = [poll_id.to_le_bytes().as_ref()],
+      bump,
+    )]
+    pub poll: Account<'info, Poll>,
+
+    #[account(
+        seeds = [poll_id.to_le_bytes().as_ref(), candidate_name.as_bytes()],
+        bump,
+    )]
+    pub candidate: Account<'info, Candidate>,
+
+}
 #[derive(Accounts)]
 #[instruction(candidate_name: String, poll_id: u64)] // these have to be in the same order as the struct fields
 pub struct InitializeCandidate<'info> {
@@ -38,7 +65,6 @@ pub struct InitializeCandidate<'info> {
 
     pub system_program: Program<'info, System>,
 }
-
 
 
 #[derive(Accounts)]
