@@ -11,12 +11,18 @@ const votingAddress = new PublicKey(IDL.address);
 
 describe('Votingdappv2', () => {
  
+  let context;
+  let provider;
+  let votingdappv2: Program<Votingdappv2>;
+
+  beforeAll(async () => {
+    context = await startAnchor("", [{name: "votingdappv2", programId: votingAddress}], []);
+    provider = new BankrunProvider(context);
+
+    votingdappv2 = new Program<Votingdappv2>(IDL, provider);
+  })
 
   it('Initialize Poll', async () => {
-    const context = await startAnchor("", [{name: "votingdappv2", programId: votingAddress}], []);
-    const provider = new BankrunProvider(context);
-
-    const votingdappv2 = new Program<Votingdappv2>(IDL, provider);
 
     await votingdappv2.methods.initializePoll(
       new anchor.BN(1),
@@ -37,5 +43,31 @@ describe('Votingdappv2', () => {
     expect(poll.pollId.toNumber()).toEqual(1);
     expect(poll.description).toEqual("What is your favorite type of video game?");
     expect(poll.pollStart.toNumber()).toBeLessThan(poll.pollEnd.toNumber());
-  })
+  });
+
+  it("initialize candidate", async() => {
+    await votingdappv2.methods.initializeCandidate(
+      "Age of Empires II",
+      new anchor.BN(1),
+    ).rpc();
+    await votingdappv2.methods.initializeCandidate(
+      "Ogre Battle 64",
+      new anchor.BN(1),
+    ).rpc();
+
+    const [aoeIIAddress] = PublicKey.findProgramAddressSync(
+      [new anchor.BN(1).toArrayLike(Buffer, 'le', 8), Buffer.from("Age of Empires II")],
+      votingAddress,
+    )
+    const aoeIICandidate = await votingdappv2.account.candidate.fetch(aoeIIAddress);
+    console.log(aoeIICandidate);
+    
+
+  });
+
+  it("vote", async() => {
+
+  });
+
+
 })
